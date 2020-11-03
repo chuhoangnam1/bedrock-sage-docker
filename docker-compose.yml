@@ -1,0 +1,49 @@
+version: "2.4"
+
+services:
+  db:
+    image: mysql:5.7
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - bedrock-sage-db:/var/lib/mysql
+
+  bedrock:
+    build:
+      dockerfile: docker/bedrock.Dockerfile
+      context: ${PWD:-.}
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ${PWD:-.}/bedrock:/app/bedrock
+      - bedrock-vendor:/app/bedrock/vendor
+      - /var/cache/composer
+    # ports:
+    #   - 8888:8080
+    depends_on:
+      - db
+
+  sage:
+    build:
+      dockerfile: docker/sage.Dockerfile
+      context: ${PWD:-.}
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ${PWD:-.}/sage:/app/sage
+      - sage-vendor:/app/sage/vendor
+      - sage-node_modules:/app/sage/node_modules
+      - /var/cache/yarn
+    depends_on:
+      - bedrock
+    ports:
+      - 3000:3000
+      - 3001:3001
+
+
+volumes:
+  bedrock-sage-db:
+  bedrock-vendor:
+  sage-vendor:
+  sage-node_modules:
