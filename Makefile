@@ -6,7 +6,7 @@ help:
 up: mount up-compose ## Mount sage to bedrock and start development environemnt
 
 up-compose: ## Start docker-compose stack
-	docker-compose -f docker-compose.yml up --build --force-recreate -d $(arg)
+	docker-compose -f docker-compose.yml up -d $(arg)
 
 down: down-compose umount ## Take down the entire docker-compose stack and umount sage
 down-compose: ## Take down the entire docker-compose stack
@@ -26,7 +26,7 @@ kill: ## Force-stop a specific service from docker-compose
 
 restart: ## Restart docker-compose stack
 	docker-compose -f docker-compose.yml stop $(arg)
-	docker-compose -f docker-compose.yml up -d --build --force-recreate --no-deps $(arg)
+	docker-compose -f docker-compose.yml up -d --no-deps $(arg)
 
 build: ## Build command for docker-compose
 	docker-compose -f docker-compose.yml build $(arg)
@@ -58,7 +58,7 @@ db-shell: ## Login to db shell using docker-compose exec command
 mount: umount-sage mount-sage ## Mount sage to bedrock
 mount-sage: ## Mount sage to bedrock
 	@mkdir -p $(shell pwd)/bedrock/web/app/themes/sage
-	@sudo bindfs -o force-user=http -o force-group=http -o create-for-user=http -o create-for-group=http -o perms=0755 $(shell pwd)/sage $(shell pwd)/bedrock/web/app/themes/sage
+	@sudo bindfs -o force-user=80 -o force-group=80 -o create-for-user=80 -o create-for-group=80 -o perms=0755 $(shell pwd)/sage $(shell pwd)/bedrock/web/app/themes/sage
 	@echo "[INFO] Mounting sage successfully. Sage is available at $(shell pwd)/bedrock/web/app/themes/sage"
 
 umount: umount-sage ## Unmount sage
@@ -66,7 +66,7 @@ umount-sage: ## Unmount sage
 	@if mount | grep $(shell pwd)/bedrock/web/app/themes/sage > /dev/null; then \
 		echo "[INFO] Detect mounted sage directory"; \
 		echo "[INFO] Proceeding to umount sage"; \
-		sudo umount sage; \
+		sudo umount $(shell pwd)/bedrock/web/app/themes/sage; \
 	elif [ -d "$(shell pwd)/bedrock/web/app/themes/sage" ]; then \
 		sudo rm -rf $(shell pwd)/bedrock/web/app/themes/sage; \
 	else \
