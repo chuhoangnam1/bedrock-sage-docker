@@ -3,6 +3,16 @@
 
 help:
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
+
+start-bedrock: umount mount ## Start wp server on bedrock
+	@wp server --docroot=$(shell pwd)/bedrock/web --host=0.0.0.0
+
+start-sage: ## Start sage yarn sync proxy to bedrock
+	@cd sage && yarn start
+
+build-sage: ## Build sage assets
+	@cd sage && yarn build:production
+
 up: mount up-compose ## Mount sage to bedrock and start development environemnt
 
 up-compose: ## Start docker-compose stack
